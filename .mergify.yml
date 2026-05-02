@@ -41,6 +41,7 @@ merge_protections:
 merge_protections_settings:
   reporting_method: check-runs
 
+  auto_merge_conditions: true
 merge_queue:
   max_parallel_checks: 2
   reset_on_external_merge: always
@@ -48,7 +49,6 @@ merge_queue:
 
 queue_rules:
   - name: squash-queue
-    autoqueue: true
     batch_size: 5
     branch_protection_injection_mode: merge
     merge_method: squash
