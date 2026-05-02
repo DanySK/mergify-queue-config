@@ -38,6 +38,7 @@ merge_protections:
       - check-success ~= .*success
 
 merge_protections_settings:
+  reporting_method: check-runs
   auto_merge_conditions:
     - -draft
     - or:
