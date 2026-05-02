@@ -30,10 +30,14 @@ pull_request_rules:
       rebase:
         bot_account: danysk
 
+merge_protections:
+  - name: CI success
+    success_conditions:
+      - check-success ~= .*success
+
 merge_protections_settings:
   auto_merge_conditions:
     - -draft
-    - check-success ~= .*success
     - or:
         - label = merge-queue
         - author = renovate[bot]
@@ -50,7 +54,6 @@ queue_rules:
     merge_method: squash
     queue_conditions:
       - -draft
-      - check-success ~= .*success
       - or:
           - label = merge-queue
           - author = renovate[bot]
