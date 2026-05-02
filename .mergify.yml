@@ -30,6 +30,17 @@ pull_request_rules:
       rebase:
         bot_account: danysk
 
+  - name: Auto-enqueue eligible pull requests
+    conditions:
+      - -draft
+      - or:
+          - label = merge-queue
+          - author = renovate[bot]
+          - author = dependabot[bot]
+    actions:
+      queue:
+        name: squash-queue
+
 merge_protections:
   - name: CI success
     if:
@@ -39,12 +50,6 @@ merge_protections:
 
 merge_protections_settings:
   reporting_method: check-runs
-  auto_merge_conditions:
-    - -draft
-    - or:
-        - label = merge-queue
-        - author = renovate[bot]
-        - author = dependabot[bot]
 
 merge_queue:
   max_parallel_checks: 2
