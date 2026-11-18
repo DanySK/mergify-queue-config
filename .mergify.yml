@@ -6,7 +6,7 @@ pull_request_rules:
       - -conflict
     actions:
       update:
-        bot_account: danysk
+        bot_account: pianinator
 
   - name: ask to resolve conflict
     conditions:
@@ -28,7 +28,7 @@ pull_request_rules:
       - -conflict
     actions:
       rebase:
-        bot_account: danysk
+        bot_account: pianinator
 
   # Once the full CI has failed on a pull request in the queue, the quick path is no longer trusted:
   # from then on, the pull request runs the full CI on every push,
