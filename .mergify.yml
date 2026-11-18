@@ -30,31 +30,75 @@ pull_request_rules:
       rebase:
         bot_account: danysk
 
+  # Once the full CI has failed on a pull request in the queue, the quick path is no longer trusted:
+  # from then on, the pull request runs the full CI on every push,
+  # and it can re-enter the queue only once the full CI is green.
+  - name: Escalate to full CI after a merge queue failure
+    conditions:
+      - or:
+          - queue-dequeue-reason = CHECKS_FAILED
+          - queue-dequeue-reason = CHECKS_TIMEOUT
+          - queue-dequeue-reason = DROPPED_BY_BISECTION_ELIMINATION
+    actions:
+      label:
+        add:
+          - full-ci
 
 merge_protections:
   - name: CI success
     if:
       - -draft
     success_conditions:
-      - check-success ~= .*success
+      - or:
+          - and:
+              - label != full-ci
+              - check-success = quick-check
+          - "check-success = ci-cd / success"
 
 merge_protections_settings:
   reporting_method: check-runs
+  # With the merge queue enabled, pull requests are queued (not merged)
+  # once they pass the merge protections and the queue_conditions.
+  auto_merge_conditions: true
 
 merge_queue:
-  max_parallel_checks: 2
+  max_parallel_checks: 3
   reset_on_external_merge: always
   status_comments: outcomes
 
+# The first matching rule wins. Pull requests matching no rule (external contributors) get `medium`.
+priority_rules:
+  - name: bots and ancillary updates
+    conditions:
+      - or:
+          - author ~= \[bot\]$
+          - label = ancillary
+    priority: low
+  - name: maintainers
+    conditions:
+      - author = DanySK
+    priority: high
+
 queue_rules:
   - name: squash-queue
-    autoqueue: true
     batch_size: 5
     branch_protection_injection_mode: merge
     merge_method: squash
+    # Step 1, on the pull request: the quick CI is green (the full CI, for pull requests labeled `full-ci`).
     queue_conditions:
       - -draft
       - or:
           - label = merge-queue
+          - label = ancillary
           - author = renovate[bot]
           - author = dependabot[bot]
+      - or:
+          - and:
+              - label != full-ci
+              - check-success = quick-check
+          - and:
+              - label = full-ci
+              - "check-success = ci-cd / success"
+    # Step 2, on the batch draft pull request (branch `mergify/merge-queue/*`): the full CI is green.
+    merge_conditions:
+      - "check-success = ci-cd / success"
