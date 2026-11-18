@@ -54,7 +54,9 @@ The configuration currently provides:
 - an automatic comment asking the author to resolve conflicts when Mergify detects them;
 - a merge protection (`CI success`) requiring, on non-draft pull requests,
   `quick-check` to succeed (or `ci-cd / success`, for pull requests labeled `full-ci`);
-- auto-queueing (`auto_merge_conditions: true`) of the non-draft pull requests that:
+- auto-queueing of the non-draft pull requests that
+  (through an explicit `queue` rule, which works even if Merge Protections are disabled on the repository,
+  and through `auto_merge_conditions: true`, which only applies where they are enabled):
   - are labeled `merge-queue` or `ancillary`, or are opened by `renovate[bot]` or `dependabot[bot]`;
   - have a green `quick-check` (a green `ci-cd / success`, if labeled `full-ci`);
 - a merge queue named `squash-queue` with:

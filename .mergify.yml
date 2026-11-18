@@ -30,6 +30,14 @@ pull_request_rules:
       rebase:
         bot_account: pianinator
 
+  # Explicit auto-queueing: unlike `auto_merge_conditions`, it does not require Merge Protections
+  # to be enabled on the repository. The queue_conditions of the queue rules decide when the pull request enters.
+  - name: Queue eligible pull requests
+    conditions:
+      - -draft
+    actions:
+      queue:
+
   # Once the full CI has failed on a pull request in the queue, the quick path is no longer trusted:
   # from then on, the pull request runs the full CI on every push,
   # and it can re-enter the queue only once the full CI is green.
